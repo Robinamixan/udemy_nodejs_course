@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  nodejs:
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile
+    image: nodejs_course
+    container_name: nodejs_course
+    env_file:
+      - ./.env
+    ports:
+      - ${EXTERNAL_PORT}:${INTERNAL_PORT}
+    volumes:
+      - ./:/app
