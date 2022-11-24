@@ -16,5 +16,6 @@ RUN npm install
 COPY . .
 
 EXPOSE ${INTERNAL_PORT}
+EXPOSE ${SECOND_INTERNAL_PORT}
 
 CMD [ "node", "server.js" ]

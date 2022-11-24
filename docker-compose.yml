@@ -11,5 +11,6 @@ services:
       - ./.env
     ports:
       - ${EXTERNAL_PORT}:${INTERNAL_PORT}
+      - ${SECOND_EXTERNAL_PORT}:${SECOND_INTERNAL_PORT}
     volumes:
       - ./:/app
