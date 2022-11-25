@@ -5,9 +5,13 @@
     "author": "Fiodar Haradkavets <robinamixan171@gmail.com>",
     "main": "server.js",
     "scripts": {
-        "start": "node server.js"
+        "start": "nodemon src/Lection-3-NodeJs-basics/38_app-files.js",
+        "start_inspect": "nodemon --inspect src/Lection-3-NodeJs-basics/38_app-files.js"
     },
     "dependencies": {
         "express": "^4.16.1"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.20"
     }
 }

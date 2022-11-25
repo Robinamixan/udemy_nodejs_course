@@ -1,0 +1,14 @@
+// Create package.json
+npm init
+
+// Run main file of project by command
+npm start
+
+// Run some custom named command
+npm run some-command
+
+// Install dependencies from package.json or update dependencies
+npm install
+
+// Install nodemon package as dev dependency
+npm install nodemon --save-dev
