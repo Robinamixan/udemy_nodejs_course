@@ -5,11 +5,14 @@
     "author": "Fiodar Haradkavets <robinamixan171@gmail.com>",
     "main": "server.js",
     "scripts": {
-        "start": "nodemon src/Assignments/3-Static-files/app.js"
+        "start": "nodemon src/Assignments/4-Templates/app.js"
     },
     "dependencies": {
         "body-parser": "^1.20.1",
-        "express": "^4.18.2"
+        "ejs": "^3.1.8",
+        "express": "^4.18.2",
+        "express-handlebars": "^3.0.2",
+        "pug": "^3.0.2"
     },
     "devDependencies": {
         "nodemon": "^2.0.20"
