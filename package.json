@@ -5,7 +5,7 @@
     "author": "Fiodar Haradkavets <robinamixan171@gmail.com>",
     "main": "server.js",
     "scripts": {
-        "start": "nodemon src/Assignments/4-Templates/app.js"
+        "start": "nodemon src/Lecture-7-MVC/98/app.js"
     },
     "dependencies": {
         "body-parser": "^1.20.1",
