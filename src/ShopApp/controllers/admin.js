@@ -2,13 +2,15 @@ const Product = require('./../models/product');
 const Cart = require('./../models/cart');
 
 exports.getProducts = (request, response, next) => {
-  Product.fetchAll((products) => {
-    response.render('admin/products-list', {
-      products: products,
-      pageTitle: 'Admin products list',
-      path: '/admin/products'
-    });
-  });
+  Product.fetchAll()
+    .then(([products]) => {
+      response.render('admin/products-list', {
+        products: products,
+        pageTitle: 'Admin products list',
+        path: request.url
+      });
+    })
+    .catch(error => console.log(error));
 };
 
 exports.getAddProduct = (request, response, next) => {
@@ -27,8 +29,12 @@ exports.postAddProduct = (request, response, next) => {
       request.body.description,
       request.body.price
   );
-  product.save();
-  response.redirect('/admin/products');
+
+  product.save()
+    .then(() => {
+      response.redirect('/');
+    })
+    .catch(error => console.log(error));
 };
 
 exports.getEditProduct = (request, response, next) => {
@@ -61,8 +67,12 @@ exports.postEditProduct = (request, response, next) => {
       request.body.description,
       request.body.price
   );
-  product.save();
-  response.redirect('/admin/products');
+
+  product.save()
+    .then(() => {
+      response.redirect('/admin/products');
+    })
+    .catch(error => console.log(error));
 };
 
 exports.postDeleteProduct = (request, response, next) => {

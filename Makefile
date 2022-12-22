@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GET_DOCKER_ID_COMMAND=$(shell docker ps -aqf "name=nodejs_course")
+GET_DOCKER_ID_COMMAND=$(shell docker ps -aqf "name=nodejs_course_web")
 
 .PHONY: start
 start:

@@ -5,13 +5,14 @@
     "author": "Fiodar Haradkavets <robinamixan171@gmail.com>",
     "main": "server.js",
     "scripts": {
-        "start": "nodemon --ignore ./Output/ src/Lecture-9-dynamic-routes/116/app.js"
+        "start": "nodemon --ignore ./Output/ src/ShopApp/app.js"
     },
     "dependencies": {
         "body-parser": "^1.20.1",
         "ejs": "^3.1.8",
         "express": "^4.18.2",
         "express-handlebars": "^3.0.2",
+        "mysql2": "^2.3.3",
         "pug": "^3.0.2"
     },
     "devDependencies": {
