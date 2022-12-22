@@ -5,7 +5,7 @@
     "author": "Fiodar Haradkavets <robinamixan171@gmail.com>",
     "main": "server.js",
     "scripts": {
-        "start": "nodemon src/Lecture-8-practice/107/app.js"
+        "start": "nodemon --ignore ./Output/ src/Lecture-9-dynamic-routes/116/app.js"
     },
     "dependencies": {
         "body-parser": "^1.20.1",

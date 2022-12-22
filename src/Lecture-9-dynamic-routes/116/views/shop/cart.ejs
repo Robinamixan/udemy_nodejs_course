@@ -1,0 +1,48 @@
+<%- include('./../includes/head.ejs') %>
+<%- include('./../includes/head_end.ejs') %>
+
+<body>
+<%- include('./../includes/navigation.ejs') %>
+<main>
+    <% if (items.length > 0) { %>
+        <div class="grid">
+            <% for (let item of items) { %>
+                <article class="card product-item">
+                    <header class="card__header">
+                        <h1 class="product__title">
+                            <%= item.productData.title %>
+                        </h1>
+                    </header>
+                    <div class="card__image">
+                        <img src="<%= item.productData.imageUrl %>" alt="<%= item.productData.title %>">
+                    </div>
+                    <div class="card__content">
+                        <h2 class="product__price">$
+                            <%= item.productData.price %>
+                        </h2>
+                        <p class="product__description">
+                            <%= item.productData.description %>
+                        </p>
+                    </div>
+                    <div>
+                        <p>Quantity:</p>
+                        <%= item.quantity %>
+                    </div>
+                    <div class="card__actions">
+                        <a href="/products/<%= item.productData.id %>" class="btn">Details</a>
+                        <form action="/cart-delete-item" method="POST">
+                            <input type="hidden" name="productId" value="<%= item.productData.id %>">
+                            <button class="btn" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </article>
+            <% } %>
+        </div>
+    <% } else { %>
+        <h1>No Products in Cart!</h1>
+    <% } %>
+</main>
+<%- include('./../includes/scripts.ejs') %>
+</body>
+
+<%- include('./../includes/end.ejs') %>
