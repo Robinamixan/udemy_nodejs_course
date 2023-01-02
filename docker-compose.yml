@@ -31,6 +31,19 @@ services:
     networks:
       - default
 
+  mongodb:
+    image: mongo
+    container_name: nodejs_course_mongodb
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - "./data/mongodb:/data/db"
+    ports:
+      - 27017:27017
+    networks:
+      - default
+
 networks:
   default:
     driver: bridge
