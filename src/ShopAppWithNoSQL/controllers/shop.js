@@ -1,8 +1,9 @@
 const Product = require('./../models/product');
+const Order = require('./../models/order');
 const log = require('../util/log');
 
 exports.getProducts = (request, response, next) => {
-  Product.fetchAll()
+  Product.find()
     .then(products => {
       response.render('shop/products-list', {
         products: products,
@@ -28,7 +29,7 @@ exports.getProductDetails = (request, response, next) => {
 };
 
 exports.getIndex = (request, response, next) => {
-  Product.fetchAll()
+  Product.find()
     .then(products => {
       response.render('shop/index', {
         products: products,
@@ -40,8 +41,10 @@ exports.getIndex = (request, response, next) => {
 };
 
 exports.getCart = (request, response, next) => {
-  request.user.getCart()
-    .then(products => {
+  request.user.populate('cart.items.productId')
+    .then(user => {
+      const products = user.cart.items;
+
       response.render('shop/cart', {
         pageTitle: 'Cart Details',
         path: request.originalUrl,
@@ -73,7 +76,7 @@ exports.postCartDeleteItem = (request, response, next) => {
 };
 
 exports.getOrders = (request, response, next) => {
-  request.user.getOrders()
+  Order.find({"user.userId": request.user._id})
     .then(orders => {
       response.render('shop/orders', {
         pageTitle: 'Orders',
@@ -85,8 +88,26 @@ exports.getOrders = (request, response, next) => {
 };
 
 exports.postCreateOrder = (request, response, next) => {
-  request.user.addOrder()
-    .then(result => {
+  request.user.populate('cart.items.productId')
+    .then(user => {
+      const items = user.cart.items;
+
+      const order = new Order({
+        user: {
+          name: request.user.name,
+          userId: request.user
+        },
+        items: items.map(item => {
+          return {quantity: item.quantity, product: {...item.productId._doc}};
+        }),
+      });
+
+      return order.save();
+    })
+    .then(() => {
+      return request.user.clearCart()
+    })
+    .then(() => {
       response.redirect('/orders');
     })
     .catch(error => log(error));

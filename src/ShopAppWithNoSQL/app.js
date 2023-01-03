@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const mongoose = require('mongoose');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
@@ -9,8 +10,6 @@ const log = require('./util/log');
 const staticPagesController = require('./controllers/static-pages');
 
 const User = require('./models/user');
-
-const mongoConnect = require('./util/database').mongoConnect;
 
 const app = express();
 
@@ -24,14 +23,9 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(rootDir, 'public')));
 
 app.use((request, response, next) => {
-  User.findById('63b2c4cf3bb30552d5f00d17')
+  User.findById('63b428bcf822cd7bb0b00c6e')
     .then(user => {
-      request.user = new User(
-        user.name,
-        user.email,
-        user.cart,
-        user._id
-      );
+      request.user = user;
       next();
     })
     .catch(error => log(error));
@@ -42,8 +36,24 @@ app.use(shopRoutes);
 
 app.use(staticPagesController.getNotFound);
 
-mongoConnect(() => {
-  app.listen(process.env.SECOND_INTERNAL_PORT);
-});
+mongoose.set('strictQuery', false);
+mongoose.connect('mongodb://readWriteUser:somepassword@nodejs_course_mongodb:27017/nosql_db')
+  .then(result => {
+    User.findOne()
+      .then(user => {
+        if (!user) {
+          const user = new User({
+            name: 'test_user',
+            email: 'test@email.com',
+            cart: {
+              items: []
+            }
+          });
+          user.save();
+        }
+      });
 
+    app.listen(process.env.SECOND_INTERNAL_PORT);
+  })
+  .catch(error => log(error));
 
