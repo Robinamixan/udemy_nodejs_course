@@ -61,20 +61,6 @@ app.use(staticPagesController.getNotFound);
 mongoose.set('strictQuery', false);
 mongoose.connect(MONGODB_URI)
   .then(result => {
-    User.findOne()
-      .then(user => {
-        if (!user) {
-          const user = new User({
-            name: 'test_user',
-            email: 'test@email.com',
-            cart: {
-              items: []
-            }
-          });
-          user.save();
-        }
-      });
-
     app.listen(process.env.SECOND_INTERNAL_PORT);
   })
   .catch(error => log(error));

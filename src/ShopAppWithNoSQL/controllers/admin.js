@@ -17,6 +17,10 @@ exports.getProducts = (request, response, next) => {
 };
 
 exports.getAddProduct = (request, response, next) => {
+  if (!request.session.isLoggedIn) {
+    return next();
+  }
+
   response.render('admin/edit-product', {
     pageTitle: 'Add product',
     path: '/admin/add-product',
