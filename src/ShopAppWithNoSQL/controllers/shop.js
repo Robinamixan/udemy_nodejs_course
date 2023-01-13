@@ -36,8 +36,7 @@ exports.getIndex = (request, response, next) => {
       response.render('shop/index', {
         products: products,
         pageTitle: 'Shop Main Page',
-        path: request.originalUrl,
-        isAuthenticated: request.session.isLoggedIn
+        path: request.originalUrl
       });
     })
     .catch(error => log(error));
