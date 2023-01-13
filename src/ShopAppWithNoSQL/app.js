@@ -2,16 +2,25 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 const rootDir = require('./../utils/rootDir');
 const log = require('./util/log');
 const staticPagesController = require('./controllers/static-pages');
 
 const User = require('./models/user');
 
+const MONGODB_URI = 'mongodb://readWriteUser:somepassword@nodejs_course_mongodb:27017/nosql_db';
+
 const app = express();
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: 'sessions'
+});
 
 // set template engine //
 app.set('view engine', 'ejs');
@@ -22,8 +31,20 @@ app.use(bodyParser.urlencoded({extended: false}));
 // set folder with public files //
 app.use(express.static(path.join(rootDir, 'public')));
 
+// initialize session
+app.use(session({
+  secret: 'test_secret',
+  resave: false,
+  saveUninitialized: false,
+  store: store
+}));
+
 app.use((request, response, next) => {
-  User.findById('63b428bcf822cd7bb0b00c6e')
+  if (!request.session.user) {
+    return next();
+  }
+
+  User.findById(request.session.user._id.toString())
     .then(user => {
       request.user = user;
       next();
@@ -33,11 +54,12 @@ app.use((request, response, next) => {
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(staticPagesController.getNotFound);
 
 mongoose.set('strictQuery', false);
-mongoose.connect('mongodb://readWriteUser:somepassword@nodejs_course_mongodb:27017/nosql_db')
+mongoose.connect(MONGODB_URI)
   .then(result => {
     User.findOne()
       .then(user => {

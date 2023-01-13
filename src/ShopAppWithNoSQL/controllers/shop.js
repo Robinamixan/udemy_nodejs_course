@@ -9,6 +9,7 @@ exports.getProducts = (request, response, next) => {
         products: products,
         pageTitle: 'Products list',
         path: request.originalUrl,
+        isAuthenticated: request.session.isLoggedIn
       });
     })
     .catch(error => log(error));
@@ -23,6 +24,7 @@ exports.getProductDetails = (request, response, next) => {
         product: product,
         pageTitle: 'Product details',
         path: request.originalUrl,
+        isAuthenticated: request.session.isLoggedIn
       });
     })
     .catch(error => log(error));
@@ -35,6 +37,7 @@ exports.getIndex = (request, response, next) => {
         products: products,
         pageTitle: 'Shop Main Page',
         path: request.originalUrl,
+        isAuthenticated: request.session.isLoggedIn
       });
     })
     .catch(error => log(error));
@@ -49,6 +52,7 @@ exports.getCart = (request, response, next) => {
         pageTitle: 'Cart Details',
         path: request.originalUrl,
         items: products,
+        isAuthenticated: request.session.isLoggedIn
       });
     })
     .catch(error => log(error));
@@ -81,7 +85,8 @@ exports.getOrders = (request, response, next) => {
       response.render('shop/orders', {
         pageTitle: 'Orders',
         path: request.originalUrl,
-        orders: orders
+        orders: orders,
+        isAuthenticated: request.session.isLoggedIn
       });
     })
     .catch(error => log(error));
@@ -117,6 +122,7 @@ exports.getCheckout = (request, response, next) => {
   response.render('shop/checkout', {
     pageTitle: 'Checkout',
     path: request.originalUrl,
+    isAuthenticated: request.session.isLoggedIn
   });
 };
 

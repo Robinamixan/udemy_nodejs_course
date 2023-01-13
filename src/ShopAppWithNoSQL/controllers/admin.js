@@ -9,7 +9,8 @@ exports.getProducts = (request, response, next) => {
       response.render('admin/products-list', {
         products: products,
         pageTitle: 'Admin products list',
-        path: request.originalUrl
+        path: request.originalUrl,
+        isAuthenticated: request.session.isLoggedIn
       });
     })
     .catch(error => log(error));
@@ -19,7 +20,8 @@ exports.getAddProduct = (request, response, next) => {
   response.render('admin/edit-product', {
     pageTitle: 'Add product',
     path: '/admin/add-product',
-    editing: false
+    editing: false,
+    isAuthenticated: request.session.isLoggedIn
   });
 };
 
@@ -57,7 +59,8 @@ exports.getEditProduct = (request, response, next) => {
         pageTitle: 'Edit product',
         path: '/admin/edit-product',
         editing: editMode,
-        product: product
+        product: product,
+        isAuthenticated: request.session.isLoggedIn
       });
     })
     .catch(error => log(error));
