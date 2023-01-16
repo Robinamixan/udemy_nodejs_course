@@ -4,11 +4,18 @@ const log = require('../util/log');
 const User = require('../models/user');
 
 exports.getSignup = (request, response, next) => {
+  let messages = request.flash('signup_error');
+  let errorMessage;
+  if (messages.length > 0) {
+    errorMessage = messages[0];
+  } else {
+    errorMessage = null;
+  }
+
   response.render('auth/signup', {
     pageTitle: 'Signup',
-    path: '/signup',
     editing: false,
-    isAuthenticated: request.session.isLoggedIn
+    errorMessage: errorMessage
   });
 };
 
@@ -20,6 +27,8 @@ exports.postSignup = (request, response, next) => {
   User.findOne({email: email})
     .then(user => {
       if (user) {
+        request.flash('signup_error', 'E-Mail exists already, please pick a different one.');
+
         return response.redirect('/signup');
       }
 
@@ -41,11 +50,18 @@ exports.postSignup = (request, response, next) => {
 }
 
 exports.getLogin = (request, response, next) => {
+  let messages = request.flash('login_error');
+  let errorMessage;
+  if (messages.length > 0) {
+    errorMessage = messages[0];
+  } else {
+    errorMessage = null;
+  }
+
   response.render('auth/login', {
     pageTitle: 'Login',
-    path: '/login',
     editing: false,
-    isAuthenticated: request.session.isLoggedIn
+    errorMessage: errorMessage
   });
 };
 
@@ -57,6 +73,8 @@ exports.postLogin = (request, response, next) => {
   User.findOne({email: email})
     .then(user => {
       if (!user) {
+        request.flash('login_error', 'Invalid email or password.');
+
         return response.redirect('/login');
       }
 
@@ -74,6 +92,8 @@ exports.postLogin = (request, response, next) => {
               response.redirect('/');
             });
           }
+
+          request.flash('login_error', 'Invalid email or password.');
 
           return response.redirect('/login');
         })

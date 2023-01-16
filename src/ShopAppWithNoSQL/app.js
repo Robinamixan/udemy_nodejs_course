@@ -4,6 +4,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const csrf = require('csurf');
+const flash = require('connect-flash');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 const adminRoutes = require('./routes/admin');
@@ -43,6 +44,7 @@ app.use(session({
 }));
 
 app.use(csurfProtection);
+app.use(flash());
 
 app.use((request, response, next) => {
   if (!request.session.user) {
@@ -60,6 +62,7 @@ app.use((request, response, next) => {
 app.use((request, response, next) => {
   response.locals.isAuthenticated = request.session.isLoggedIn;
   response.locals.csrfToken = request.csrfToken();
+  response.locals.path = request.originalUrl;
   next();
 });
 

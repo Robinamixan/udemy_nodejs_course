@@ -7,9 +7,7 @@ exports.getProducts = (request, response, next) => {
     .then(products => {
       response.render('shop/products-list', {
         products: products,
-        pageTitle: 'Products list',
-        path: request.originalUrl,
-        isAuthenticated: request.session.isLoggedIn
+        pageTitle: 'Products list'
       });
     })
     .catch(error => log(error));
@@ -22,9 +20,7 @@ exports.getProductDetails = (request, response, next) => {
     .then(product => {
       response.render('shop/product-details', {
         product: product,
-        pageTitle: 'Product details',
-        path: request.originalUrl,
-        isAuthenticated: request.session.isLoggedIn
+        pageTitle: 'Product details'
       });
     })
     .catch(error => log(error));
@@ -35,8 +31,7 @@ exports.getIndex = (request, response, next) => {
     .then(products => {
       response.render('shop/index', {
         products: products,
-        pageTitle: 'Shop Main Page',
-        path: request.originalUrl
+        pageTitle: 'Shop Main Page'
       });
     })
     .catch(error => log(error));
@@ -49,9 +44,7 @@ exports.getCart = (request, response, next) => {
 
       response.render('shop/cart', {
         pageTitle: 'Cart Details',
-        path: request.originalUrl,
-        items: products,
-        isAuthenticated: request.session.isLoggedIn
+        items: products
       });
     })
     .catch(error => log(error));
@@ -83,9 +76,7 @@ exports.getOrders = (request, response, next) => {
     .then(orders => {
       response.render('shop/orders', {
         pageTitle: 'Orders',
-        path: request.originalUrl,
-        orders: orders,
-        isAuthenticated: request.session.isLoggedIn
+        orders: orders
       });
     })
     .catch(error => log(error));
@@ -119,9 +110,7 @@ exports.postCreateOrder = (request, response, next) => {
 
 exports.getCheckout = (request, response, next) => {
   response.render('shop/checkout', {
-    pageTitle: 'Checkout',
-    path: request.originalUrl,
-    isAuthenticated: request.session.isLoggedIn
+    pageTitle: 'Checkout'
   });
 };
 
