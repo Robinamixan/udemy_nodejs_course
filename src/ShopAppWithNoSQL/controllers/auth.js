@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+const { validationResult } = require('express-validator');
 
 const log = require('../util/log');
 const User = require('../models/user');
@@ -31,37 +32,36 @@ exports.getSignup = (request, response, next) => {
 exports.postSignup = (request, response, next) => {
   const email = request.body.email;
   const password = request.body.password;
-  const confirmPassword = request.body.confirmPassword;
 
-  User.findOne({email: email})
-    .then(user => {
-      if (user) {
-        request.flash('signup_error', 'E-Mail exists already, please pick a different one.');
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return response.status(422).render('auth/signup', {
+      pageTitle: 'Signup',
+      editing: false,
+      errorMessage: errors.array()[0].msg
+    });
+  }
 
-        return response.redirect('/signup');
-      }
+  bcrypt.hash(password, 12)
+    .then(hashedPassword => {
+      const newUser = new User({
+        email: email,
+        password: hashedPassword,
+        cart: {items: []}
+      });
 
-      return bcrypt.hash(password, 12)
-        .then(hashedPassword => {
-          const newUser = new User({
-            email: email,
-            password: hashedPassword,
-            cart: {items: []}
-          });
-
-          return newUser.save();
-        })
-        // .then(result => {
-        //   return transporter.sendMail({
-        //     to: 'robinamixan171@gmail.com',
-        //     from: 'learning@learn.com',
-        //     subject: 'Signup successful',
-        //     html: '<h1>You successfully signup</h1>'
-        //   });
-        // })
-        .then(result => {
-          response.redirect('/login');
-        });
+      return newUser.save();
+    })
+    // .then(result => {
+    //   return transporter.sendMail({
+    //     to: 'robinamixan171@gmail.com',
+    //     from: 'learning@learn.com',
+    //     subject: 'Signup successful',
+    //     html: '<h1>You successfully signup</h1>'
+    //   });
+    // })
+    .then(result => {
+      response.redirect('/login');
     })
     .catch(error => log(error));
 }
