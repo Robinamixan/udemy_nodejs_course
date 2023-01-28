@@ -16,11 +16,9 @@ const staticPagesController = require('./controllers/static-pages');
 
 const User = require('./models/user');
 
-const MONGODB_URI = 'mongodb://readWriteUser:somepassword@nodejs_course_mongodb:27017/nosql_db';
-
 const app = express();
 const store = new MongoDBStore({
-  uri: MONGODB_URI,
+  uri: process.env.MONGODB_URI,
   collection: 'sessions'
 });
 
@@ -37,7 +35,7 @@ app.use(express.static(path.join(rootDir, 'public')));
 
 // initialize session
 app.use(session({
-  secret: 'test_secret',
+  secret: process.env.SESSION_SECRET_KEY,
   resave: false,
   saveUninitialized: false,
   store: store
@@ -73,7 +71,7 @@ app.use(authRoutes);
 app.use(staticPagesController.getNotFound);
 
 mongoose.set('strictQuery', false);
-mongoose.connect(MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(result => {
     app.listen(process.env.SECOND_INTERNAL_PORT);
   })
