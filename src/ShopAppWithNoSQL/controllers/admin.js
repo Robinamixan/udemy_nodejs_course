@@ -1,3 +1,5 @@
+const { validationResult } = require('express-validator');
+
 const Product = require('./../models/product');
 const log = require('../util/log');
 
@@ -26,6 +28,17 @@ exports.getAddProduct = (request, response, next) => {
 };
 
 exports.postAddProduct = (request, response, next) => {
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return response.status(422).render('admin/edit-product', {
+      pageTitle: 'Add product',
+      editing: false,
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      product: {...request.body}
+    });
+  }
+
   const product = new Product({
     title: request.body.title,
     price: request.body.price,
@@ -57,7 +70,7 @@ exports.getEditProduct = (request, response, next) => {
 
       response.render('admin/edit-product', {
         pageTitle: 'Edit product',
-        editing: editMode,
+        editing: true,
         product: product
       });
     })
@@ -66,6 +79,17 @@ exports.getEditProduct = (request, response, next) => {
 
 exports.postEditProduct = (request, response, next) => {
   const productId = request.body.productId;
+
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return response.status(422).render('admin/edit-product', {
+      pageTitle: 'Edit product',
+      editing: true,
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      product: {...request.body, _id: productId}
+    });
+  }
 
   Product.findById(productId)
     .then(product => {

@@ -12,6 +12,7 @@ router.post(
   '/signup',
   [
     check('email')
+      .normalizeEmail()
       .isEmail()
       .withMessage('Please enter a valid email.')
       .custom((value, { req }) => {
@@ -26,9 +27,11 @@ router.post(
       'password',
       'Please enter password with only numbers and text and at least 5 characters.'
     )
+      .trim()
       .isLength({min: 5})
       .isAlphanumeric(),
     body('confirmPassword')
+      .trim()
       .custom((value, { req }) => {
         if (value !== req.body.password) {
           throw new Error('Confirm password should be equal to original password.');
@@ -46,12 +49,14 @@ router.post(
   '/login',
   [
     body('email')
+      .normalizeEmail()
       .isEmail()
       .withMessage('Please enter a valid email.'),
     body(
       'password',
       'Please enter password with only numbers and text and at least 5 characters.'
     )
+      .trim()
       .isLength({min: 5})
       .isAlphanumeric(),
   ],

@@ -38,7 +38,13 @@ exports.postSignup = (request, response, next) => {
     return response.status(422).render('auth/signup', {
       pageTitle: 'Signup',
       editing: false,
-      errorMessage: errors.array()[0].msg
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      currentInput: {
+        email: email,
+        password: password,
+        confirmPassword: request.body.confirmPassword
+      }
     });
   }
 
@@ -92,7 +98,12 @@ exports.postLogin = (request, response, next) => {
     return response.status(422).render('auth/login', {
       pageTitle: 'Login',
       editing: false,
-      errorMessage: errors.array()[0].msg
+      errorMessage: errors.array()[0].msg,
+      validationErrors: errors.array(),
+      currentInput: {
+        email: email,
+        password: password
+      }
     });
   }
 
