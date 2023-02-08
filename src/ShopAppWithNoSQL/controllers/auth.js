@@ -6,6 +6,7 @@ const { validationResult } = require('express-validator');
 
 const log = require('../util/log');
 const User = require('../models/user');
+const createError = require('../util/createError');
 
 const transporter = nodemailer.createTransport(sendgridTransport({
   auth: {
@@ -69,7 +70,7 @@ exports.postSignup = (request, response, next) => {
     .then(result => {
       response.redirect('/login');
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 }
 
 exports.getLogin = (request, response, next) => {
@@ -136,14 +137,14 @@ exports.postLogin = (request, response, next) => {
         })
         .catch(error => {
           if (error) {
-            console.log(error);
+            log(error);
           }
           response.redirect('/login');
         });
 
 
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.postLogout = (request, response, next) => {
@@ -205,7 +206,7 @@ exports.postReset = (request, response, next) => {
         log(`http://localhost:49161/reset/${token}`);
         response.redirect('/');
       })
-      .catch(error => log(error));
+      .catch(error => next(createError(error)));
   });
 };
 
@@ -236,7 +237,7 @@ exports.getNewPassword = (request, response, next) => {
         passwordToken: token
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.postNewPassword = (request, response, next) => {
@@ -265,5 +266,5 @@ exports.postNewPassword = (request, response, next) => {
     .then(result => {
       response.redirect('/login');
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };

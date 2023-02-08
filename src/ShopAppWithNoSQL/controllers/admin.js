@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 
 const Product = require('./../models/product');
 const log = require('../util/log');
+const createError = require('../util/createError');
 
 exports.getProducts = (request, response, next) => {
   Product.find({userId: request.user._id})
@@ -13,7 +14,7 @@ exports.getProducts = (request, response, next) => {
         pageTitle: 'Admin products list'
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.getAddProduct = (request, response, next) => {
@@ -51,7 +52,7 @@ exports.postAddProduct = (request, response, next) => {
     .then(result => {
       response.redirect('/');
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.getEditProduct = (request, response, next) => {
@@ -74,7 +75,7 @@ exports.getEditProduct = (request, response, next) => {
         product: product
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.postEditProduct = (request, response, next) => {
@@ -106,7 +107,7 @@ exports.postEditProduct = (request, response, next) => {
         response.redirect('/admin/products');
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.postDeleteProduct = (request, response, next) => {

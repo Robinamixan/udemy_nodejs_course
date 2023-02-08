@@ -1,6 +1,7 @@
 const Product = require('./../models/product');
 const Order = require('./../models/order');
 const log = require('../util/log');
+const createError = require('../util/createError');
 
 exports.getProducts = (request, response, next) => {
   Product.find()
@@ -10,7 +11,7 @@ exports.getProducts = (request, response, next) => {
         pageTitle: 'Products list'
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.getProductDetails = (request, response, next) => {
@@ -23,7 +24,7 @@ exports.getProductDetails = (request, response, next) => {
         pageTitle: 'Product details'
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.getIndex = (request, response, next) => {
@@ -34,7 +35,7 @@ exports.getIndex = (request, response, next) => {
         pageTitle: 'Shop Main Page'
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.getCart = (request, response, next) => {
@@ -47,7 +48,7 @@ exports.getCart = (request, response, next) => {
         items: products
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.postAddToCart = (request, response, next) => {
@@ -58,7 +59,7 @@ exports.postAddToCart = (request, response, next) => {
       request.user.addToCart(product);
       response.redirect('/cart');
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.postCartDeleteItem = (request, response, next) => {
@@ -68,7 +69,7 @@ exports.postCartDeleteItem = (request, response, next) => {
     .then(result => {
       response.redirect('/cart');
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.getOrders = (request, response, next) => {
@@ -79,7 +80,7 @@ exports.getOrders = (request, response, next) => {
         orders: orders
       });
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.postCreateOrder = (request, response, next) => {
@@ -105,7 +106,7 @@ exports.postCreateOrder = (request, response, next) => {
     .then(() => {
       response.redirect('/orders');
     })
-    .catch(error => log(error));
+    .catch(error => next(createError(error)));
 };
 
 exports.getCheckout = (request, response, next) => {

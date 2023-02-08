@@ -11,7 +11,7 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 const rootDir = require('./../utils/rootDir');
-const log = require('./util/log');
+const createError = require('./util/createError');
 const staticPagesController = require('./controllers/static-pages');
 
 const User = require('./models/user');
@@ -45,35 +45,49 @@ app.use(csurfProtection);
 app.use(flash());
 
 app.use((request, response, next) => {
-  if (!request.session.user) {
-    return next();
-  }
-
-  User.findById(request.session.user._id.toString())
-    .then(user => {
-      request.user = user;
-      next();
-    })
-    .catch(error => log(error));
-});
-
-app.use((request, response, next) => {
   response.locals.isAuthenticated = request.session.isLoggedIn;
   response.locals.csrfToken = request.csrfToken();
   response.locals.path = request.originalUrl;
   next();
 });
 
+app.use((request, response, next) => {
+  if (!request.session.user) {
+    return next();
+  }
+
+  User.findById(request.session.user._id.toString())
+    .then(user => {
+      if (!user) {
+        return next();
+      }
+
+      request.user = user;
+      next();
+    })
+    .catch(error => next(createError(error)));
+});
+
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
+app.get('/500', staticPagesController.get500);
+
 app.use(staticPagesController.getNotFound);
+
+app.use((error, request, response, next) => {
+  console.log(error);
+
+  response.render('500', {
+    pageTitle: 'Error page'
+  });
+});
 
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.MONGODB_URI)
   .then(result => {
     app.listen(process.env.SECOND_INTERNAL_PORT);
   })
-  .catch(error => log(error));
+  .catch(error => createError(error));
 
