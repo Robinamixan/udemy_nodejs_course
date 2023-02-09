@@ -12,7 +12,7 @@
             <%= errorMessage %>
         </div>
     <% } %>
-    <form class="product-form" action="/admin/<%= editing ? 'edit-product' : 'add-product' %>" method="POST">
+    <form class="product-form" action="/admin/<%= editing ? 'edit-product' : 'add-product' %>" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="form-control">
             <label for="title">Title</label>
@@ -25,13 +25,11 @@
             >
         </div>
         <div class="form-control">
-            <label for="imageUrl">Image URL</label>
+            <label for="imageUrl">Image</label>
             <input
-                    class="<%= locals.validationErrors && validationErrors.find(error => error.param === 'imageUrl') ? 'invalid' : '' %>"
-                    type="text"
-                    name="imageUrl"
-                    id="imageUrl"
-                    value="<%= editing || locals.product ? product.imageUrl : '/images/book-4986.png' %>"
+                    type="file"
+                    name="image"
+                    id="image"
             >
         </div>
         <div class="form-control">

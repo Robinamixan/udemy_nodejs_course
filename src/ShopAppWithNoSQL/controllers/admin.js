@@ -40,11 +40,13 @@ exports.postAddProduct = (request, response, next) => {
     });
   }
 
+  console.log(request.file);
+
   const product = new Product({
     title: request.body.title,
     price: request.body.price,
     description: request.body.description,
-    imageUrl: request.body.imageUrl,
+    image: request.body.image,
     userId: request.user
   });
 

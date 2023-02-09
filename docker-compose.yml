@@ -17,19 +17,19 @@ services:
     networks:
       - default
 
-  mysql:
-    image: "mysql:5.7"
-    container_name: nodejs_course_mysql
-    ports:
-      - "49165:3306"
-    environment:
-      MYSQL_ROOT_USER: root
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-      MYSQL_DATABASE: nodejs_course
-    volumes:
-      - "./data/db:/var/lib/mysql"
-    networks:
-      - default
+#  mysql:
+#    image: "mysql:5.7"
+#    container_name: nodejs_course_mysql
+#    ports:
+#      - "49165:3306"
+#    environment:
+#      MYSQL_ROOT_USER: root
+#      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+#      MYSQL_DATABASE: nodejs_course
+#    volumes:
+#      - "./data/db:/var/lib/mysql"
+#    networks:
+#      - default
 
   mongodb:
     image: mongo

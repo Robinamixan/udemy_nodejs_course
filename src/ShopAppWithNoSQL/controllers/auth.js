@@ -139,6 +139,7 @@ exports.postLogin = (request, response, next) => {
           if (error) {
             log(error);
           }
+
           response.redirect('/login');
         });
 

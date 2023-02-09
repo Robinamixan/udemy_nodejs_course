@@ -20,8 +20,6 @@ router.post(
       .trim()
       .isString()
       .isLength({min: 3}),
-    body('imageUrl', 'Please enter valid image url.')
-      .isURL({require_host: false}),
     body('price', 'Please enter a valid price with decimal points.')
       .isFloat(),
     body('description', 'Please enter valid description.')
@@ -44,8 +42,6 @@ router.post(
       .trim()
       .isString()
       .isLength({min: 3}),
-    body('imageUrl', 'Please enter valid image url.')
-      .isURL({require_host: false}),
     body('price', 'Please enter a valid price with decimal points.')
       .isFloat(),
     body('description', 'Please enter valid description.')
