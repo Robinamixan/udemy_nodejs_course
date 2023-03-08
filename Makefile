@@ -1,10 +1,9 @@
 #!/bin/bash
 
-GET_DOCKER_ID_COMMAND=$(shell docker ps -aqf "name=nodejs_course_web")
-
 .PHONY: start
 start:
 	@docker-compose -f docker-compose.yml up -d
+	@docker exec -it nodejs_course_web npm start
 
 .PHONY: stop
 stop:
@@ -17,5 +16,5 @@ rebuild-and-start:
 .PHONY: bash
 bash:
 	$(eval DOCKER_ID=$(GET_DOCKER_ID_COMMAND))
-	@docker exec -it $(DOCKER_ID) bash
+	@docker exec -it nodejs_course_web bash
 

@@ -8,7 +8,7 @@ services:
     image: nodejs_course
     container_name: nodejs_course_web
     env_file:
-      - ./.env
+      - ./.env.local
     ports:
       - ${EXTERNAL_PORT}:${INTERNAL_PORT}
       - ${SECOND_EXTERNAL_PORT}:${SECOND_INTERNAL_PORT}
