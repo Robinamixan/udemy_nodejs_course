@@ -5,15 +5,15 @@ services:
     build:
       context: .
       dockerfile: Docker/Dockerfile
-    image: nodejs_course
     container_name: nodejs_course_web
     env_file:
-      - ./.env.local
+      - ./.env
     ports:
       - ${EXTERNAL_PORT}:${INTERNAL_PORT}
       - ${SECOND_EXTERNAL_PORT}:${SECOND_INTERNAL_PORT}
     volumes:
       - ./:/app
+      - /app/node_modules
     networks:
       - default
 
@@ -40,7 +40,7 @@ services:
     volumes:
       - "./data/mongodb:/data/db"
     ports:
-      - 27017:27017
+      - 27018:27017
     networks:
       - default
 

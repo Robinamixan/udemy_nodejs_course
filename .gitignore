@@ -3,4 +3,4 @@
 /output
 /upload
 npm-debug.log
-.env.local
+.env
