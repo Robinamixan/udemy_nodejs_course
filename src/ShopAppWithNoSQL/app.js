@@ -72,7 +72,7 @@ app.use(flash());
 app.use((request, response, next) => {
   response.locals.isAuthenticated = request.session.isLoggedIn;
   response.locals.csrfToken = request.csrfToken();
-  response.locals.path = request.originalUrl;
+  response.locals.path = request.path;
   next();
 });
 

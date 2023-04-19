@@ -1,0 +1,24 @@
+<section class="pagination">
+    <%# First Page %>
+    <% if (page !== 1 && (page - 1) !== 1) { %>
+        <a href="?page=1">1</a>
+    <% } %>
+
+    <%# Previous Page %>
+    <% if (page > 1) { %>
+        <a href="?page=<%= page - 1 %>"><%= (page - 1) %></a>
+    <% } %>
+
+    <%# Current Page %>
+    <a href="?page=<%= page %>" class="active"><%= page %></a>
+
+    <%# Next Page %>
+    <% if (itemsPerPage * page < totalCount) { %>
+        <a href="?page=<%= page + 1 %>"><%= (page + 1) %></a>
+    <% } %>
+
+    <%# Last Page %>
+    <% if (lastPage !== page && lastPage !== page + 1) { %>
+        <a href="?page=<%= lastPage %>"><%= lastPage %></a>
+    <% } %>
+</section>

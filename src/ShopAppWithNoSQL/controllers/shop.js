@@ -6,12 +6,30 @@ const log = require('../util/log');
 const pdfInvoiceGenerator = require('../services/pdfInvoiceGenerator');
 const createError = require('../util/createError');
 
+const ITEMS_PER_PAGE = 2;
+
 exports.getProducts = (request, response, next) => {
-  Product.find()
+  const page = +request.query.page || 1;
+  let totalCount = 0;
+
+  Product.countDocuments()
+    .then(count => {
+      totalCount = count;
+
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then(products => {
       response.render('shop/products-list', {
         products: products,
-        pageTitle: 'Products list'
+        pageTitle: 'Products list',
+        paginationInfo: {
+          page: page,
+          totalCount: totalCount,
+          itemsPerPage: ITEMS_PER_PAGE,
+          lastPage: Math.ceil(totalCount/ ITEMS_PER_PAGE)
+        }
       });
     })
     .catch(error => next(createError(error)));
@@ -31,11 +49,27 @@ exports.getProductDetails = (request, response, next) => {
 };
 
 exports.getIndex = (request, response, next) => {
-  Product.find()
+  const page = +request.query.page || 1;
+  let totalCount = 0;
+
+  Product.countDocuments()
+    .then(count => {
+      totalCount = count;
+
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then(products => {
       response.render('shop/index', {
         products: products,
-        pageTitle: 'Shop Main Page'
+        pageTitle: 'Shop Main Page',
+        paginationInfo: {
+          page: page,
+          totalCount: totalCount,
+          itemsPerPage: ITEMS_PER_PAGE,
+          lastPage: Math.ceil(totalCount/ ITEMS_PER_PAGE)
+        }
       });
     })
     .catch(error => next(createError(error)));

@@ -5,14 +5,30 @@ const log = require('../util/log');
 const file = require('../util/file');
 const createError = require('../util/createError');
 
+const ITEMS_PER_PAGE = 2;
+
 exports.getProducts = (request, response, next) => {
-  Product.find({userId: request.user._id})
-    // .select('title price')
-    // .populate('userId', 'name')
+  const page = +request.query.page || 1;
+  let totalCount = 0;
+
+  Product.countDocuments()
+    .then(count => {
+      totalCount = count;
+
+      return Product.find({userId: request.user._id})
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then(products => {
       response.render('admin/products-list', {
         products: products,
-        pageTitle: 'Admin products list'
+        pageTitle: 'Admin products list',
+        paginationInfo: {
+          page: page,
+          totalCount: totalCount,
+          itemsPerPage: ITEMS_PER_PAGE,
+          lastPage: Math.ceil(totalCount/ ITEMS_PER_PAGE)
+        }
       });
     })
     .catch(error => next(createError(error)));
@@ -51,7 +67,6 @@ exports.postAddProduct = (request, response, next) => {
     });
   }
 
-  console.log(request.file);
   const imageUrl = request.file.path;
 
   const product = new Product({
