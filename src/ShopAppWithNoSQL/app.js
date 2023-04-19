@@ -12,6 +12,7 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 const rootDir = require('./../utils/rootDir');
+const uploadDir = require('./../utils/uploadDir');
 const createError = require('./util/createError');
 const log = require('./util/log');
 const staticPagesController = require('./controllers/static-pages');
@@ -55,6 +56,7 @@ app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
 
 // set folder with public files //
 app.use(express.static(path.join(rootDir, 'public')));
+app.use('/upload', express.static(path.join(uploadDir, 'upload')));
 
 // initialize session
 app.use(session({

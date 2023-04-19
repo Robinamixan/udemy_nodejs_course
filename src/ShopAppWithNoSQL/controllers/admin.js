@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 
 const Product = require('./../models/product');
 const log = require('../util/log');
+const file = require('../util/file');
 const createError = require('../util/createError');
 
 exports.getProducts = (request, response, next) => {
@@ -40,13 +41,24 @@ exports.postAddProduct = (request, response, next) => {
     });
   }
 
+  if (!request.file) {
+    return response.status(422).render('admin/edit-product', {
+      pageTitle: 'Add product',
+      editing: false,
+      errorMessage: 'Attach file is not an image',
+      validationErrors: [],
+      product: {...request.body}
+    });
+  }
+
   console.log(request.file);
+  const imageUrl = request.file.path;
 
   const product = new Product({
     title: request.body.title,
     price: request.body.price,
     description: request.body.description,
-    image: request.body.image,
+    imageUrl: imageUrl,
     userId: request.user
   });
 
@@ -103,7 +115,10 @@ exports.postEditProduct = (request, response, next) => {
       product.title = request.body.title;
       product.price = request.body.price;
       product.description = request.body.description;
-      product.imageUrl = request.body.imageUrl;
+      if (request.file) {
+        file.deleteFile(product.imageUrl);
+        product.imageUrl = request.file.path;
+      }
 
       return product.save().then(result => {
         response.redirect('/admin/products');
@@ -115,10 +130,18 @@ exports.postEditProduct = (request, response, next) => {
 exports.postDeleteProduct = (request, response, next) => {
   const productId = request.body.productId;
 
-  Product.deleteOne({
-    _id: productId,
-    userId: request.user._id
-  })
+  Product.findById(productId)
+    .then(product => {
+      if (!product) {
+        return new Error('Product not found.');
+      }
+
+      file.deleteFile(product.imageUrl);
+      return Product.deleteOne({
+        _id: productId,
+        userId: request.user._id
+      })
+    })
     .then(result => {
       response.redirect('/admin/products');
     })

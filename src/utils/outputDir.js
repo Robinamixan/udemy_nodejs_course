@@ -1,1 +1,1 @@
-module.exports = '/app/Output';
+module.exports = '/app/output';

@@ -1,6 +1,9 @@
+const { validationResult } = require('express-validator');
+
 const Product = require('./../models/product');
 const Order = require('./../models/order');
 const log = require('../util/log');
+const pdfInvoiceGenerator = require('../services/pdfInvoiceGenerator');
 const createError = require('../util/createError');
 
 exports.getProducts = (request, response, next) => {
@@ -105,6 +108,30 @@ exports.postCreateOrder = (request, response, next) => {
     })
     .then(() => {
       response.redirect('/orders');
+    })
+    .catch(error => next(createError(error)));
+};
+
+exports.getInvoice = (request, response, next) => {
+  const orderId = request.params.orderId;
+  const errors = validationResult(request);
+  if (!errors.isEmpty()) {
+    return next(new Error(errors.array()[0].msg));
+  }
+
+  Order.findById(orderId)
+    .then(order => {
+      if (!order) {
+        return next(new Error('No order found.'));
+      }
+
+      if (order.user.userId.toString() !== request.user._id.toString()) {
+        return next(new Error('Unauthorized.'));
+      }
+
+      response.setHeader('Content-Type', 'application/pdf');
+      response.setHeader('Content-Disposal', 'inline; filename="' + pdfInvoiceGenerator.generateName(orderId) + '"');
+      pdfInvoiceGenerator.generate(order, response);
     })
     .catch(error => next(createError(error)));
 };
