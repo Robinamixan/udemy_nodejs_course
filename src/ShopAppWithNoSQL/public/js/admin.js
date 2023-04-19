@@ -14,7 +14,6 @@ const deleteProduct = (button) => {
       return result.json();
     })
     .then(data => {
-      console.log(data);
       productElement.remove();
     })
     .catch(error => {

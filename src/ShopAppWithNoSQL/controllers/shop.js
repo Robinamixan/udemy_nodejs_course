@@ -1,8 +1,9 @@
 const { validationResult } = require('express-validator');
+require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_API_KEY);
 
 const Product = require('./../models/product');
 const Order = require('./../models/order');
-const log = require('../util/log');
 const pdfInvoiceGenerator = require('../services/pdfInvoiceGenerator');
 const createError = require('../util/createError');
 
@@ -120,7 +121,7 @@ exports.getOrders = (request, response, next) => {
     .catch(error => next(createError(error)));
 };
 
-exports.postCreateOrder = (request, response, next) => {
+exports.getCheckoutSuccess = (request, response, next) => {
   request.user.populate('cart.items.productId')
     .then(user => {
       const items = user.cart.items;
@@ -171,8 +172,50 @@ exports.getInvoice = (request, response, next) => {
 };
 
 exports.getCheckout = (request, response, next) => {
-  response.render('shop/checkout', {
-    pageTitle: 'Checkout'
-  });
+  let items;
+  let totalPrice = 0;
+
+  request.user.populate('cart.items.productId')
+    .then(user => {
+      items = user.cart.items;
+
+      totalPrice = 0;
+      items.forEach((item) => {
+        totalPrice += item.quantity * item.productId.price;
+      });
+
+      if (process.env.STRIPE_PRIVATE_API_KEY === 'FIX') {
+        return response.redirect('/checkout/success');
+      }
+
+      return stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: items.map(item => {
+          return {
+            name: item.productId.name,
+            description: item.productId.description,
+            amount: item.productId.price * 100,
+            currency: 'USD',
+            quantity: item.quantity,
+          }
+        }),
+        success_url: request.protocol + '://' + request.get('host') + '/checkout/success',
+        cancel_url: request.protocol + '://' + request.get('host') + '/checkout/cancel',
+      });
+    })
+    .then((session) => {
+      if (process.env.STRIPE_PRIVATE_API_KEY === 'FIX') {
+        return response.redirect('/checkout/success');
+      }
+
+      response.render('shop/checkout', {
+        pageTitle: 'Checkout',
+        items: items,
+        totalPrice: totalPrice,
+        stripeApiKey: process.env.STRIPE_PUBLIC_API_KEY,
+        sessionId: session.id
+      });
+    })
+    .catch(error => next(createError(error)));
 };
 
