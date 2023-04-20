@@ -1,7 +1,11 @@
-module.exports.errorHandler = (error, request, response) => {
+module.exports.errorHandler = (error, request, response, next) => {
+  if (!error) {
+    next();
+  }
+
   const statusCode = error.statusCode || 500;
 
-  console.log('Debug [' + new Date().toISOString() + ']: ' + error + ' Status code: [' + statusCode + ']');
+  console.log('Debug [' + new Date().toISOString() + ']: ' + error.message + ' Status code: [' + statusCode + ']');
 
   return response.status(statusCode).json({
     message: error.message,

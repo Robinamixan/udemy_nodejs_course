@@ -12,3 +12,14 @@ module.exports.expressValidation = (request, response, next) => {
 
   next();
 };
+
+module.exports.fileUploadValidation = (request, response, next) => {
+  if (!request.file) {
+    const error = new Error('No file provided.');
+    error.statusCode = 422;
+
+    throw error;
+  }
+
+  next();
+};

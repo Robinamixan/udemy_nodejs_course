@@ -5,14 +5,19 @@ const mongoose = require('mongoose');
 const feedRoutes = require('./routes/feed');
 const corsMiddleware = require('./middleware/corsHeaders');
 const errorMiddleware = require('./middleware/errorHandler');
+const fileMiddleware = require('./middleware/fileUploader');
 const createError = require('../ShopAppWithNoSQL/util/createError');
 const path = require('path');
+const uploadDir = require('../utils/uploadDir');
 
 const app = express();
-app.use(bodyParser.json());
-app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 
-app.use(corsMiddleware.corsHeaders);
+app.use(bodyParser.json());
+app.use(corsMiddleware.corsHeadersHandler);
+app.use(fileMiddleware.prepareUploadHandler('image'));
+
+app.use('/images', express.static(path.join(uploadDir, 'upload')));
+app.use('/upload', express.static(path.join(uploadDir, 'upload')));
 
 app.use('/feed', feedRoutes);
 
