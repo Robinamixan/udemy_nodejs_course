@@ -5,7 +5,7 @@
     "author": "Fiodar Haradkavets <robinamixan171@gmail.com>",
     "main": "server.js",
     "scripts": {
-        "start": "nodemon --ignore ./Output/ src/ShopAppWithNoSQL/app.js"
+        "start": "nodemon --ignore ./Output/ src/ShopRestApi/app.js"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
