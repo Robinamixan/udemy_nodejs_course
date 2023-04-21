@@ -15,6 +15,5 @@ rebuild-and-start:
 
 .PHONY: bash
 bash:
-	$(eval DOCKER_ID=$(GET_DOCKER_ID_COMMAND))
 	@docker exec -it nodejs_course_web bash
 

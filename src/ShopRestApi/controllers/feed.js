@@ -1,4 +1,5 @@
 const Post = require('../models/post');
+const User = require('../models/user');
 
 const fileManager = require('../services/fileManager');
 
@@ -30,12 +31,7 @@ exports.getPostDetails = (request, response, next) => {
 
   Post.findById(postId)
     .then(post => {
-      if (!post) {
-        const error = new Error('Post was not found');
-        error.statusCode = 404;
-
-        throw error;
-      }
+      assertPostExist(post);
 
       response.status(200).json({
         message: 'Post fetched.',
@@ -50,16 +46,28 @@ exports.postPost = (request, response, next) => {
     title: request.body.title,
     content: request.body.content,
     imageUrl: request.file.path,
-    creator: {
-      name: 'test_user',
-    },
+    creator: request.userId,
   });
+  let creator;
 
   post.save()
-    .then(result => {
+    .then(() => {
+      return User.findById(request.userId);
+    })
+    .then(user => {
+      creator = user;
+      user.posts.push(post);
+
+      return user.save();
+    })
+    .then(user => {
       response.status(201).json({
         message: 'Post created',
-        post: result,
+        post: post,
+        creator: {
+          _id: user._id.toString(),
+          name: user.name
+        }
       });
     })
     .catch(error => {
@@ -83,12 +91,8 @@ exports.putPost = (request, response, next) => {
 
   Post.findById(postId)
     .then(post => {
-      if (!post) {
-        const error = new Error('Post was not found');
-        error.statusCode = 404;
-
-        throw error;
-      }
+      assertPostExist(post);
+      assertRequestFromCreator(request, post);
 
       if (imageUrl !== post.imageUrl) {
         fileManager.deleteFile(post.imageUrl);
@@ -115,16 +119,20 @@ exports.deletePost = (request, response, next) => {
 
   Post.findById(postId)
     .then(post => {
-      if (!post) {
-        const error = new Error('Post was not found');
-        error.statusCode = 404;
-
-        throw error;
-      }
+      assertPostExist(post);
+      assertRequestFromCreator(request, post);
 
       fileManager.deleteFile(post.imageUrl);
 
       return post.delete();
+    })
+    .then(() => {
+      return User.findById(request.userId);
+    })
+    .then(user => {
+      user.posts.pull(postId);
+
+      return user.save();
     })
     .then(() => {
       response.status(200).json({
@@ -134,4 +142,22 @@ exports.deletePost = (request, response, next) => {
     .catch(error => {
       next(error);
     });
+};
+
+const assertPostExist = (post) => {
+  if (!post) {
+    const error = new Error('Post was not found.');
+    error.statusCode = 404;
+
+    throw error;
+  }
+};
+
+const assertRequestFromCreator = (request, post) => {
+  if (request.userId !== post.creator.toString()) {
+    const error = new Error('Not authorized.');
+    error.statusCode = 403;
+
+    throw error;
+  }
 };

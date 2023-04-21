@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
 const corsMiddleware = require('./middleware/corsHeaders');
 const errorMiddleware = require('./middleware/errorHandler');
 const fileMiddleware = require('./middleware/fileUploader');
@@ -20,6 +21,7 @@ app.use('/images', express.static(path.join(uploadDir, 'upload')));
 app.use('/upload', express.static(path.join(uploadDir, 'upload')));
 
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 app.use(errorMiddleware.errorHandler);
 

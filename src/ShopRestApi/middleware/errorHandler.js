@@ -7,8 +7,11 @@ module.exports.errorHandler = (error, request, response, next) => {
 
   console.log('Debug [' + new Date().toISOString() + ']: ' + error.message + ' Status code: [' + statusCode + ']');
 
-  return response.status(statusCode).json({
-    message: error.message,
-    errors: error.previusErrors || [],
-  });
+  const responseData = {message: error.message}
+
+  if (error.previusErrors) {
+    responseData.errors = error.previusErrors;
+  }
+
+  return response.status(statusCode).json(responseData);
 };
