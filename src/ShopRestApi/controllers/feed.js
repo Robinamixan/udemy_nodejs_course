@@ -3,79 +3,74 @@ const User = require('../models/user');
 
 const fileManager = require('../services/fileManager');
 
-exports.getPosts = (request, response) => {
+exports.getPosts = async (request, response, next) => {
   const currentPage = request.query.page || 1;
   const itemPerPage = 2;
-  let totalCount;
 
-  Post.countDocuments()
-    .then(count => {
-      totalCount = count;
+  try {
+    const totalCount = await Post.countDocuments();
 
-      return Post.find()
-        .skip((currentPage - 1) * itemPerPage)
-        .limit(itemPerPage);
-    })
-    .then(posts => {
-      response.status(200).json({
-        message: 'Posts fetched.',
-        posts: posts,
-        totalItems: totalCount,
-      });
-    })
-    .catch(error => next(error));
+    const posts = await Post.find()
+      .populate('creator')
+      .skip((currentPage - 1) * itemPerPage)
+      .limit(itemPerPage);
+
+    response.status(200).json({
+      message: 'Posts fetched.',
+      posts: posts,
+      totalItems: totalCount,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.getPostDetails = (request, response, next) => {
+exports.getPostDetails = async (request, response, next) => {
   const postId = request.params.postId;
 
-  Post.findById(postId)
-    .then(post => {
-      assertPostExist(post);
+  try {
+    const post = await Post.findById(postId).populate('creator');
 
-      response.status(200).json({
-        message: 'Post fetched.',
-        post: post,
-      });
-    })
-    .catch(error => next(error));
+    assertPostExist(post);
+
+    response.status(200).json({
+      message: 'Post fetched.',
+      post: post,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.postPost = (request, response, next) => {
+exports.postPost = async (request, response, next) => {
   const post = new Post({
     title: request.body.title,
     content: request.body.content,
     imageUrl: request.file.path,
     creator: request.userId,
   });
-  let creator;
 
-  post.save()
-    .then(() => {
-      return User.findById(request.userId);
-    })
-    .then(user => {
-      creator = user;
-      user.posts.push(post);
+  try {
+    await post.save();
 
-      return user.save();
-    })
-    .then(user => {
-      response.status(201).json({
-        message: 'Post created',
-        post: post,
-        creator: {
-          _id: user._id.toString(),
-          name: user.name
-        }
-      });
-    })
-    .catch(error => {
-      next(error);
+    const user = await User.findById(request.userId);
+    user.posts.push(post);
+    await user.save();
+
+    response.status(201).json({
+      message: 'Post created',
+      post: post,
+      creator: {
+        _id: user._id.toString(),
+        name: user.name,
+      },
     });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.putPost = (request, response, next) => {
+exports.putPost = async (request, response, next) => {
   const postId = request.params.postId;
   let imageUrl = request.body.image;
   if (request.file) {
@@ -89,59 +84,52 @@ exports.putPost = (request, response, next) => {
     throw error;
   }
 
-  Post.findById(postId)
-    .then(post => {
-      assertPostExist(post);
-      assertRequestFromCreator(request, post);
+  try {
+    const post = await Post.findById(postId);
+    assertPostExist(post);
+    assertRequestFromCreator(request, post);
 
-      if (imageUrl !== post.imageUrl) {
-        fileManager.deleteFile(post.imageUrl);
-      }
+    if (imageUrl !== post.imageUrl) {
+      fileManager.deleteFile(post.imageUrl);
+    }
 
-      post.title = request.body.title;
-      post.content = request.body.content;
-      post.imageUrl = imageUrl;
-      return post.save();
-    })
-    .then(result => {
-      response.status(200).json({
-        message: 'Post updated.',
-        post: result,
-      });
-    })
-    .catch(error => {
-      next(error);
+    post.title = request.body.title;
+    post.content = request.body.content;
+    post.imageUrl = imageUrl;
+    await post.save();
+
+    response.status(200).json({
+      message: 'Post updated.',
+      post: post,
     });
+
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.deletePost = (request, response, next) => {
+exports.deletePost = async (request, response, next) => {
   const postId = request.params.postId;
 
-  Post.findById(postId)
-    .then(post => {
-      assertPostExist(post);
-      assertRequestFromCreator(request, post);
+  try {
+    const post = await Post.findById(postId);
 
-      fileManager.deleteFile(post.imageUrl);
+    assertPostExist(post);
+    assertRequestFromCreator(request, post);
 
-      return post.delete();
-    })
-    .then(() => {
-      return User.findById(request.userId);
-    })
-    .then(user => {
-      user.posts.pull(postId);
+    fileManager.deleteFile(post.imageUrl);
+    await post.delete();
 
-      return user.save();
-    })
-    .then(() => {
-      response.status(200).json({
-        message: 'Post deleted.',
-      });
-    })
-    .catch(error => {
-      next(error);
+    const user = await User.findById(request.userId);
+    user.posts.pull(postId);
+    await user.save();
+
+    response.status(200).json({
+      message: 'Post deleted.',
     });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const assertPostExist = (post) => {

@@ -3,7 +3,6 @@ require('dotenv').config();
 
 module.exports = (request, response, next) => {
   const authorizationHeader = request.get('Authorization');
-  console.log(request.headers);
   if (!authorizationHeader) {
     throwAuthorizationError();
   }

@@ -1,6 +1,8 @@
 const express = require('express');
 const {body} = require('express-validator');
+
 const validationMiddleware = require('../middleware/validation');
+const isAuthorized = require('../middleware/authorization');
 
 const authController = require('../controllers/auth');
 const User = require('../models/user');
@@ -40,6 +42,20 @@ router.post(
   ],
   validationMiddleware.expressValidation,
   authController.login
+);
+
+router.get('/user/status', isAuthorized, authController.getUserStatus);
+
+router.patch(
+  '/user/status',
+  isAuthorized,
+  [
+    body('status')
+      .notEmpty()
+      .withMessage('Please provide status.'),
+  ],
+  validationMiddleware.expressValidation,
+  authController.updateUserStatus
 );
 
 module.exports = router;
