@@ -10,6 +10,7 @@ const fileMiddleware = require('./middleware/fileUploader');
 const createError = require('../ShopAppWithNoSQL/util/createError');
 const path = require('path');
 const uploadDir = require('../utils/uploadDir');
+const socket = require('./socket');
 
 const app = express();
 
@@ -28,6 +29,10 @@ app.use(errorMiddleware.errorHandler);
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(process.env.SECOND_INTERNAL_PORT);
+    const server = app.listen(process.env.SECOND_INTERNAL_PORT);
+    const socketServer = socket.init(server);
+    socketServer.on('connection', () => {
+      console.log('Debug [' + new Date().toISOString() + ']: Client connected');
+    });
   })
   .catch(error => createError(error));

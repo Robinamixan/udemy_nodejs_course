@@ -2,6 +2,7 @@ const Post = require('../models/post');
 const User = require('../models/user');
 
 const fileManager = require('../services/fileManager');
+const socket = require('../socket');
 
 exports.getPosts = async (request, response, next) => {
   const currentPage = request.query.page || 1;
@@ -13,7 +14,8 @@ exports.getPosts = async (request, response, next) => {
     const posts = await Post.find()
       .populate('creator')
       .skip((currentPage - 1) * itemPerPage)
-      .limit(itemPerPage);
+      .limit(itemPerPage)
+      .sort({createdAt: -1});
 
     response.status(200).json({
       message: 'Posts fetched.',
@@ -52,10 +54,16 @@ exports.postPost = async (request, response, next) => {
 
   try {
     await post.save();
+    await post.populate('creator');
 
     const user = await User.findById(request.userId);
     user.posts.push(post);
     await user.save();
+
+    socket.getConnection().emit('posts', {
+      action: 'create',
+      post: post
+    });
 
     response.status(201).json({
       message: 'Post created',
@@ -85,7 +93,8 @@ exports.putPost = async (request, response, next) => {
   }
 
   try {
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate('creator');
+
     assertPostExist(post);
     assertRequestFromCreator(request, post);
 
@@ -97,6 +106,11 @@ exports.putPost = async (request, response, next) => {
     post.content = request.body.content;
     post.imageUrl = imageUrl;
     await post.save();
+
+    socket.getConnection().emit('posts', {
+      action: 'update',
+      post: post
+    });
 
     response.status(200).json({
       message: 'Post updated.',
@@ -124,6 +138,11 @@ exports.deletePost = async (request, response, next) => {
     user.posts.pull(postId);
     await user.save();
 
+    socket.getConnection().emit('posts', {
+      action: 'delete',
+      post: post
+    });
+
     response.status(200).json({
       message: 'Post deleted.',
     });
@@ -142,7 +161,7 @@ const assertPostExist = (post) => {
 };
 
 const assertRequestFromCreator = (request, post) => {
-  if (request.userId !== post.creator.toString()) {
+  if (request.userId !== post.creator._id.toString()) {
     const error = new Error('Not authorized.');
     error.statusCode = 403;
 
