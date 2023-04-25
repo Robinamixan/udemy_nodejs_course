@@ -5,7 +5,8 @@
     "author": "Fiodar Haradkavets <robinamixan171@gmail.com>",
     "main": "server.js",
     "scripts": {
-        "start": "nodemon --ignore ./Output/ src/ShopRestApi/app.js"
+        "start": "nodemon --ignore ./Output/ src/ShopRestApi/app.js",
+        "test": "mocha \"src/ShopRestApi/test/**/*.js\""
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
@@ -33,6 +34,10 @@
         "stripe": "^12.1.1"
     },
     "devDependencies": {
-        "nodemon": "^2.0.20"
+        "chai": "^4.3.7",
+        "mocha": "^10.2.0",
+        "nodemon": "^2.0.20",
+        "sinon": "^15.0.4",
+        "supertest": "^6.3.3"
     }
 }

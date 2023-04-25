@@ -17,3 +17,6 @@ rebuild-and-start:
 bash:
 	@docker exec -it nodejs_course_web bash
 
+.PHONY: test
+test:
+	@docker exec -it nodejs_course_web npm test
