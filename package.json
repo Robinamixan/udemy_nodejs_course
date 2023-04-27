@@ -5,8 +5,8 @@
     "author": "Fiodar Haradkavets <robinamixan171@gmail.com>",
     "main": "server.js",
     "scripts": {
-        "start": "nodemon --ignore ./Output/ src/ShopRestApi/app.js",
-        "test": "mocha \"src/ShopRestApi/test/**/*.js\""
+        "start": "nodemon --ignore ./Output/ src/ShopGraphQL/app.js",
+        "test": "mocha \"src/ShopGraphQL/test/**/*.js\""
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
@@ -17,9 +17,11 @@
         "dotenv": "^16.0.3",
         "ejs": "^3.1.8",
         "express": "^4.18.2",
+        "express-graphql": "^0.12.0",
         "express-handlebars": "^3.0.2",
         "express-session": "^1.17.3",
         "express-validator": "^6.14.3",
+        "graphql": "^16.6.0",
         "jsonwebtoken": "^9.0.0",
         "mongodb": "^4.13.0",
         "mongoose": "^6.8.2",
@@ -31,7 +33,8 @@
         "pug": "^3.0.2",
         "sequelize": "^6.28.0",
         "socket.io": "^4.6.1",
-        "stripe": "^12.1.1"
+        "stripe": "^12.1.1",
+        "validator": "^13.9.0"
     },
     "devDependencies": {
         "chai": "^4.3.7",
