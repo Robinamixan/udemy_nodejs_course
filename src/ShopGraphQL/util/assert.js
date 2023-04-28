@@ -24,3 +24,12 @@ module.exports.assertRequestFromCreator = (request, post) => {
     throw error;
   }
 };
+
+module.exports.assertUserExist = (user) => {
+  if (!user) {
+    const error = new Error('User was not found.');
+    error.statusCode = 401;
+
+    throw error;
+  }
+}

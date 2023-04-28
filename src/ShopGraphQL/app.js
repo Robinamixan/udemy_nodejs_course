@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const {graphqlHTTP} = require('express-graphql');
 
 const corsMiddleware = require('./middleware/corsHeaders');
-const errorMiddleware = require('./middleware/errorHandler');
 const fileMiddleware = require('./middleware/fileUploader');
 const createError = require('../ShopAppWithNoSQL/util/createError');
 const path = require('path');
@@ -23,7 +22,7 @@ app.use(fileMiddleware.prepareUploadHandler('image'));
 app.use('/images', express.static(path.join(uploadDir, 'upload')));
 app.use('/upload', express.static(path.join(uploadDir, 'upload')));
 
-app.put('/post-image', (request, response, next) => {
+app.put('/post-image', (request, response) => {
   if (!request.file) {
     response.status(200).json({ message: 'No image provided.'});
   }
@@ -45,16 +44,18 @@ app.use('/graphql', graphqlHTTP({
     if (!error.originalError) {
       return error;
     }
+    const statusCode = error.originalError.statusCode || 500;
+
+    console.log('Debug [' + new Date().toISOString() + ']: ' + error.message + ' Status code: [' + statusCode + ']');
+
 
     return {
       message: error.message || 'Error occurred',
-      status: error.originalError.statusCode || 500,
+      status: statusCode,
       data: error.originalError.data
     };
   }
 }));
-
-app.use(errorMiddleware.errorHandler);
 
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.MONGODB_URI)
